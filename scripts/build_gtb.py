@@ -70,8 +70,9 @@ if __name__ == '__main__':
             for line in f:
                 filename = line.strip()
                 if filename not in full_list:
-                    raise IOError(f'File {options.gtfs}/{filename} is missing')
-                gtfs_list.append(filename)
+                    logging.warn(f'File {filename} is missing in the full list')
+                else:
+                    gtfs_list.append(filename)
     else:
         gtfs_list = full_list
 
