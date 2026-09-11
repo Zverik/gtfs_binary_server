@@ -12,6 +12,11 @@
     version: main
     update: true
 
+- name: Set up a virtualenv for the repo
+  pip:
+    virtualenv: /opt/gtfs/.venv
+    requirements: /opt/gtfs/scripts/requirements.txt
+
 - name: Create a directory for source gtfs feeds
   file:
     path: /var/gtfs

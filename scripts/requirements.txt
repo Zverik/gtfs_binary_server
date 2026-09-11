@@ -1,0 +1,2 @@
+gtfs-binary @ git+https://github.com/Zverik/gtfs-binary.git
+pyyaml>=6.0.3
