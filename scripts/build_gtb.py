@@ -58,10 +58,10 @@ if __name__ == '__main__':
             rules[rulefile[:rulefile.index('.')]] = yaml.safe_load(f)
 
     # Filter out feeds to big.
-    full_list = [f for f in os.listdir(options.gtfs) if f[-4:] == '.zip']
+    full_list = [f for f in os.listdir(options.gtfs) if f.endswith('.gtfs.zip')]
     if options.max and options.max > 0:
         max_bytes = options.max * 1024 * 1024
-        full_list = [f for f in full_list if os.stat(f).st_size <= max_bytes]
+        full_list = [f for f in full_list if os.stat(os.path.join(options.gtfs, f)).st_size <= max_bytes]
 
     # Read list of gtfs files
     if options.list:

@@ -1,7 +1,9 @@
 ---
-- name: Install bsdiff
+- name: Install bsdiff and virtualenv
   apt:
-    name: bsdiff
+    name:
+      - bsdiff
+      - python3-virtualenv
     state: present
 
 - name: Check out this exact repo to the server

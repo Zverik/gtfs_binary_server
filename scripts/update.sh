@@ -11,7 +11,7 @@ BSDIFF=${BSDIFF:-bsdiff}
 "$SCRIPTS/download_feeds.sh" "$GTFS"
 "$PYTHON" "$SCRIPTS/find_modified.py" --path "$GTFS" --output "$GTFS/updated.lst"
 "$PYTHON" "$SCRIPTS/build_gtb.py" --gtfs "$GTFS" --output "$GTB" --list "$GTFS/updated.lst" \
-  --rules "$SCRIPTS/../feeds" --max $MAX_GTFS_ZIP_MB
+  --rules "$SCRIPTS/../feeds" --max $MAX_GTFS_ZIP_MB --verbose
 "$PYTHON" "$SCRIPTS/calculate_diffs.py" --path "$GTB/archive" --output "$GTB/diffs" \
   --keep $KEEP_DIFFS --bsdiff "$BSDIFF"
 "$PYTHON" "$SCRIPTS/generate_overview.py" --path "$GTB" --output "$GTB/feeds.json"

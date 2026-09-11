@@ -27,7 +27,7 @@
 
 - name: Add {{ admin }} to sudoers
   copy:
-    content: "{{ admin }} ALL=(ALL) NOPASSWD:ALL"
+    content: "{{ admin }} ALL=(ALL) NOPASSWD:ALL\n"
     dest: /etc/sudoers.d/admin
 
 - name: Remove ssh authorized_key
