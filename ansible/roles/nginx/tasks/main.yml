@@ -1,0 +1,56 @@
+---
+- name: Install nginx
+  apt: name=nginx state=present
+
+- name: Create the www directory
+  file:
+    path: /var/www/html
+    state: directory
+    owner: www-data
+
+- name: Copy index.html
+  copy:
+    src: index.html
+    dest: /var/www/html/
+
+- name: Create the gtb directory
+  file:
+    path: /var/www/gtb
+    state: directory
+    owner: www-data
+
+- name: Upload the config
+  copy:
+    src: nginx.conf
+    dest: /etc/nginx/nginx.conf
+
+- name: Install the site config
+  template:
+    src: gtfs.conf.j2
+    dest: /etc/nginx/sites-available/gtfs.conf
+
+- name: Disable default site configuration
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Enable the gtfs website
+  file:
+    src: /etc/nginx/sites-available/gtfs.conf
+    dest: /etc/nginx/sites-enabled/gtfs.conf
+    state: link
+
+- name: Install the logrotate config
+  copy:
+    src: logrotate
+    dest: /etc/logrotate.d/nginx
+
+- name: Check that nginx is started
+  systemd:
+    name: nginx
+    state: started
+
+- name: And now reload nginx
+  systemd:
+    name: nginx
+    state: reloaded

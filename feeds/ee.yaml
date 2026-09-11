@@ -1,0 +1,13 @@
+---
+_agencies:
+  realtime:
+    - url: https://jbb.ghsq.de/gtfs/elron/VehiclePositions
+      type: gtfs-rt
+      agencies: [10520953]
+  ticket_info:
+    - file: ee_elron.md
+      agencies: [10520953]
+tallinn:
+  title: Tallinn
+  ticket_info:
+    - file: ee_tallinn.md

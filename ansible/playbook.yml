@@ -1,0 +1,16 @@
+---
+- hosts: all
+  gather_facts: no
+  become: yes
+  # remote_user: root
+  roles:
+    - common
+
+- hosts: all
+  become: yes
+  roles:
+    - { role: geerlingguy.ntp, tags: ntp }
+    - { role: nginx, tags: nginx }
+    - { role: firewall, tags: firewall }
+    - { role: geerlingguy.certbot, tags: certbot }
+    - { role: gtfs, tags: gtfs }

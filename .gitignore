@@ -1,0 +1,4 @@
+scripts/out/
+.venv/
+ansible/roles.galaxy/
+.vault_pass

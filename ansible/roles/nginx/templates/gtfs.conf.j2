@@ -1,0 +1,35 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name gtfs.osmz.ee;
+
+    # For certbot
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/html/;
+    }
+
+    return 301 https://$host$request_uri;
+}
+
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name gtfs.osmz.ee;
+
+    http2 on;
+
+    ssl_certificate {{ cert_path.gtfs }}/fullchain.pem;
+    ssl_certificate_key {{ cert_path.gtfs }}/privkey.pem;
+
+    charset UTF-8;
+
+    location / {
+      root /var/www/html;
+    }
+
+    location /gtb {
+      root /var/www/gtb;
+      autoindex on;
+    }
+}
