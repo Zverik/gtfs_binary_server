@@ -1,1 +1,27 @@
 ---
+- name: Install bsdiff
+  apt:
+    name: bsdiff
+    state: present
+
+- name: Check out this exact repo to the server
+  git:
+    repo: https://github.com/Zverik/gtfs_binary_server.git
+    dest: /opt/gtfs
+    single_branch: true
+    version: main
+    update: true
+
+- name: Create a directory for source gtfs feeds
+  file:
+    path: /var/gtfs
+    state: directory
+    owner: www-data
+
+- name: Create a directory for diffs
+  file:
+    path: /var/www/gtb/diffs
+    state: directory
+    owner: www-data
+
+# TODO: add the updater to cron
