@@ -28,8 +28,8 @@ server {
       root /var/www/html;
     }
 
-    location /gtb {
-      root /var/www/gtb;
+    location /gtb/ {
+      alias /var/www/gtb/;
       autoindex on;
     }
 }

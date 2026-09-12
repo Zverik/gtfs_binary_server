@@ -70,7 +70,7 @@ if __name__ == '__main__':
             for line in f:
                 filename = line.strip()
                 if filename not in full_list:
-                    logging.warn(f'File {filename} is missing in the full list')
+                    logging.warning(f'File {filename} is missing in the full list')
                 else:
                     gtfs_list.append(filename)
     else:

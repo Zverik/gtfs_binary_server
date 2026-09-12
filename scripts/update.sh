@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e -u
-SCRIPTS=$(dirname "$0")
-PYTHON=${PYTHON:-python3}
-GTFS=${GTFS:-/var/gtfs}
-GTB=${GTB:-/var/www/gtb}
+SCRIPTS="$(dirname "$0")"
+PYTHON="$(realpath "${PYTHON:-python3}")"
+GTFS="${GTFS:-/var/gtfs}"
+GTB="${GTB:-/var/www/gtb}"
 MAX_GTFS_ZIP_MB=${MAX_GTFS_ZIP_MB:-100}
 KEEP_DIFFS=${KEEP_DIFFS:-20}
 BSDIFF=${BSDIFF:-bsdiff}

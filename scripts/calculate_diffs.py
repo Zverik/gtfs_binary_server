@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
         # Prune the archive
         versions.sort()
-        while len(versions) > options.max:
+        while len(versions) > options.keep:
             os.remove(os.path.join(feedpath, f'{versions[0]}.gtb.gz'))
             versions.pop(0)
 
