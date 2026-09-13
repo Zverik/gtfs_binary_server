@@ -7,7 +7,15 @@ _agencies:
   ticket_info:
     - file: ee_elron.md
       agencies: [10520953]
+  title: Eesti
+  title_en: Estonia
+
 tallinn:
   title: Tallinn
+  title_en: Tallinn
   ticket_info:
     - file: ee_tallinn.md
+
+elron:
+  title: Rongid
+  title_en: Trains

@@ -2,11 +2,15 @@
 digitraffic:
   skip: true
 hsl:
-  skip: true
+  title: Helsinki, Suomi
+  title_en: Helsinki, Finland
 nysse:
   skip: true
 "229":
   skip: true
-fintraffic:
+suomi:
   title: Suomi
-  title_en: Finland
+  title_en: Finland except Helsinki
+  source: fintraffic
+  agencies: ['1000']
+  negate: true
