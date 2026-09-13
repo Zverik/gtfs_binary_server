@@ -4,4 +4,4 @@ if [ -z "${1-}" ]; then
   exit 1
 fi
 
-wget --limit-rate=30m --mirror -l 0 --no-parent --cut-dirs=1 --no-host-directories --include-directories=gtfs --accept .zip -e robots=off -P "$1" https://api.transitous.org/gtfs/
+wget --limit-rate=30m --mirror -l 0 --no-parent --cut-dirs=1 --no-host-directories --include-directories=gtfs --accept .zip -e robots=off --no-verbose -P "$1" https://api.transitous.org/gtfs/

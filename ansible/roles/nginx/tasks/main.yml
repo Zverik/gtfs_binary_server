@@ -13,12 +13,6 @@
     src: index.html
     dest: /var/www/html/
 
-- name: Create the gtb directory
-  file:
-    path: /var/www/gtb
-    state: directory
-    owner: www-data
-
 - name: Upload the config
   copy:
     src: nginx.conf

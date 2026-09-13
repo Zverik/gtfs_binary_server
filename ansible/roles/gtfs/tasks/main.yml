@@ -1,4 +1,8 @@
 ---
+- name: Create gtfs user
+  user:
+    name: gtfs
+
 - name: Install bsdiff and virtualenv
   apt:
     name:
@@ -6,10 +10,18 @@
       - python3-virtualenv
     state: present
 
+- name: Create /opt/gtfs
+  file:
+    path: /opt/gtfs
+    state: directory
+    owner: gtfs
+
 - name: Check out this exact repo to the server
+  become: yes
+  become_user: gtfs
   git:
     repo: https://github.com/Zverik/gtfs_binary_server.git
-    dest: /opt/gtfs
+    dest: /opt/gtfs/server
     single_branch: true
     version: main
     update: true
@@ -17,18 +29,43 @@
 - name: Set up a virtualenv for the repo
   pip:
     virtualenv: /opt/gtfs/.venv
-    requirements: /opt/gtfs/scripts/requirements.txt
+    requirements: /opt/gtfs/server/scripts/requirements.txt
 
 - name: Create a directory for source gtfs feeds
   file:
     path: /var/gtfs
     state: directory
-    owner: www-data
+    owner: gtfs
+
+- name: Create the gtb directory
+  file:
+    path: /var/www/gtb
+    state: directory
+    owner: gtfs
 
 - name: Create a directory for diffs
   file:
     path: /var/www/gtb/diffs
     state: directory
-    owner: www-data
+    owner: gtfs
 
-# TODO: add the updater to cron
+- name: Create log directory
+  file:
+    path: /var/log/gtb
+    state: directory
+    owner: gtfs
+
+- name: Upload updater
+  copy:
+    src: update_gtb.sh
+    dest: /opt/gtfs/
+    mode: '755'
+    owner: gtfs
+
+- name: Add the updater to cron
+  cron:
+    name: update gtb
+    user: gtfs
+    job: /opt/gtfs_sc/update_gtb.sh
+    minute: '0'
+    hour: '4'
