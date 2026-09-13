@@ -11,6 +11,6 @@ nysse:
 suomi:
   title: Suomi
   title_en: Finland except Helsinki
-  source: fintraffic
+  split: fintraffic
   agencies: ['1000']
   negate: true

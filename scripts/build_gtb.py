@@ -159,7 +159,7 @@ if __name__ == '__main__':
                     to_process.difference_update(to_merge)
 
             elif 'split' in frules:
-                source = f'{lprefix}{frules["source"]}.gtfs.zip'
+                source = f'{lprefix}{frules["split"]}.gtfs.zip'
                 if source in gtfs_list:
                     logging.debug('Splitting %s from %s', feedfile, source)
                     splitpath = os.path.join(options.gtfs, source)
