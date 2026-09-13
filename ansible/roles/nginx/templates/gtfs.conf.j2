@@ -29,7 +29,7 @@ server {
     }
 
     location /gtb/ {
-      alias /var/www/gtb/;
+      alias {{ gtb_path }}/;
       autoindex on;
     }
 }

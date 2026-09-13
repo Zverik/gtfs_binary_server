@@ -1,3 +1,4 @@
 ---
 ntp.timezone: Europe/Tallinn
 admin: zverik
+gtb_path: /mnt/HC_Volume_106798455/gtb

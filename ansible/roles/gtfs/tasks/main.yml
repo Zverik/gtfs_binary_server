@@ -39,13 +39,13 @@
 
 - name: Create the gtb directory
   file:
-    path: /var/www/gtb
+    path: "{{ gtb_path }}"
     state: directory
     owner: gtfs
 
 - name: Create a directory for diffs
   file:
-    path: /var/www/gtb/diffs
+    path: "{{ gtb_path }}/diffs"
     state: directory
     owner: gtfs
 
@@ -56,9 +56,9 @@
     owner: gtfs
 
 - name: Upload updater
-  copy:
-    src: update_gtb.sh
-    dest: /opt/gtfs/
+  template:
+    src: update_gtb.sh.j2
+    dest: /opt/gtfs/update_gtb.sh
     mode: '755'
     owner: gtfs
 
