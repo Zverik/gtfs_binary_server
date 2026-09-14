@@ -8,10 +8,15 @@ import shutil
 import logging
 
 
-def convert_feed(source: str, rules: dict, target_path: str):
+def convert_feed(source: str, rules: dict, target_path: str, max_bytes: int):
     basename = os.path.basename(source)
     basename = (basename if '.' not in basename
                 else basename[:basename.index('.')])
+
+    if max_bytes > 1000 and os.stat(source).st_size > max_bytes:
+        logging.warning('Skipping {basename} because it\'t too big')
+        return
+
     gtb_file = f'{basename}.gtb'
     gtb_full = os.path.join(target_path, gtb_file)
     follows = gtb_full if os.path.exists(gtb_full) else '0'
@@ -103,10 +108,6 @@ if __name__ == '__main__':
     # Filter out feeds to big.
     full_list = [f for f in os.listdir(options.gtfs)
                  if f.endswith('.gtfs.zip')]
-    if options.max and options.max > 0:
-        max_bytes = options.max * 1024 * 1024
-        full_list = [f for f in full_list if os.stat(
-            os.path.join(options.gtfs, f)).st_size <= max_bytes]
 
     # Read list of gtfs files
     if options.list:
@@ -121,6 +122,10 @@ if __name__ == '__main__':
                     gtfs_list.append(filename)
     else:
         gtfs_list = full_list
+
+    max_bytes = 0
+    if options.max and options.max > 0:
+        max_bytes = options.max * 1024 * 1024
 
     for language, feeds in rules.items():
         lprefix = language + '_'
@@ -154,7 +159,7 @@ if __name__ == '__main__':
                     logging.debug(
                         'Merging %s feeds into %s', len(to_merge), feedfile)
                     merge_feeds(to_merge, feedpath)
-                    convert_feed(feedpath, rules, options.output)
+                    convert_feed(feedpath, rules, options.output, max_bytes)
                     os.remove(feedpath)
                     to_process.difference_update(to_merge)
 
@@ -164,7 +169,7 @@ if __name__ == '__main__':
                     logging.debug('Splitting %s from %s', feedfile, source)
                     splitpath = os.path.join(options.gtfs, source)
                     split_feed(splitpath, frules, rules_path, feedpath)
-                    convert_feed(feedpath, rules, options.output)
+                    convert_feed(feedpath, rules, options.output, max_bytes)
                     os.remove(feedpath)
                     used_for_splitting.add(source)
 
@@ -176,7 +181,7 @@ if __name__ == '__main__':
                 if feedfile in to_process:
                     # Simple conversion with added metadata
                     logging.debug('Converting feed %s', feedfile)
-                    convert_feed(feedpath, rules, options.output)
+                    convert_feed(feedpath, rules, options.output, max_bytes)
                     to_process.remove(feedfile)
 
         to_process -= used_for_splitting
@@ -184,4 +189,5 @@ if __name__ == '__main__':
             # Converting the rest of the feeds with no metadata
             logging.debug('Converting feed %s without metadata', feedfile)
             convert_feed(
-                os.path.join(options.gtfs, feedfile), {}, options.output)
+                os.path.join(options.gtfs, feedfile), {},
+                options.output, max_bytes)
