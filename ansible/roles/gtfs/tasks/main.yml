@@ -69,3 +69,4 @@
     job: /opt/gtfs_sc/update_gtb.sh
     minute: '0'
     hour: '4'
+    weekday: '0,3'
