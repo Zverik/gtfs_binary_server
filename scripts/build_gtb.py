@@ -51,7 +51,7 @@ def merge_rules(grules: dict, frules: dict) -> dict:
 def inline_info(rules: dict, rules_path: str):
     for ti in rules.get('ticket_info', []):
         if 'file' in ti:
-            infopath = os.path.join(rules_path, 'meta', ti)
+            infopath = os.path.join(rules_path, 'meta', ti['file'])
             with open(infopath, 'r') as f:
                 ti['content'] = f.read()
 
