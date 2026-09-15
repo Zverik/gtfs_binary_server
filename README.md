@@ -82,6 +82,36 @@ and `uk_wales.gtfs.zip`.
 There is also an `merge: all` option to merge every single feed for the country.
 Please make sure they are less than 100 MB combined, try aiming for ~50 MB.
 
+## Server Directory Structure
+
+The files are published to [gtfs.osmz.ee](https://gtfs.osmz.ee/gtb/). Here is where everything is:
+
+```
+gtb
+├── ee_elron.gtb   <-- country_region.gtb, the latest binary feed
+├── fi_hsl.gtb
+├── feeds.json     <-- JSON array with the latest version, bbox and title for every feed
+├── diffs
+│   ├── ee_elron   <-- look for bsdiff output for ee_elron here
+│   │   ├── 5.diff <-- use it to update from version 5 to the latest (or +20 versions)
+│   │   ├── 6.diff <-- assuming 7 is the latest, so 6 here is top
+│   │   └── versions.json <-- very small file with a list of versions and the latest one
+│   └── fi_hsl
+│       ├── 6.diff
+│       └── versions.json
+└── archive
+    ├── ee_elron
+    │   ├── 5.gtb.gz <-- gzipped historic feed
+    │   ├── 6.gtb.gz
+    │   └── 7.gtb.gz
+    └── fi_hsl
+        ├── 6.gtb.gz
+        └── 7.gtb.gz
+```
+
+Note that the server expects and accepts gzip encoding for transfer! It would decrease the size
+~3 times!
+
 ## Author and License
 
 Mostly build by Ilya Zverev and published under the CC0 licence for text and data and

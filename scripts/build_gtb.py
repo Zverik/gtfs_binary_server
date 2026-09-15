@@ -62,7 +62,7 @@ def merge_feeds(feeds: list[str], target: str):
 
 def split_feed(source: str, rules: dict, rules_path: str, target: str):
     agencies = [str(s) for s in rules.get('agencies', [])]
-    geometry = None if 'geojson' in rules else os.path.join(
+    geometry = None if 'geojson' not in rules else os.path.join(
         rules_path, 'meta', rules['geojson'])
     polygons = [str(s) for s in rules.get('polygons', [])]
     negate = rules.get('negate', False)
