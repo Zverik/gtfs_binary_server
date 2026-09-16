@@ -26,6 +26,7 @@ class Filters:
 class ProcessorBase:
     filename: str = ''
     required: bool = True
+    write: bool = True
 
     def process(self, row: dict[str, str], filters: Filters) -> bool:
         raise NotImplementedError()
@@ -42,6 +43,22 @@ class ProcessorBase:
                 for row in r:
                     if self.process(row, filters):
                         w.writerow(row)
+
+
+class ReadOnlyProcessorBase:
+    filename: str = ''
+    required: bool = True
+
+    def process(self, row: dict[str, str], filters: Filters) -> None:
+        raise NotImplementedError()
+
+    def run(self, gtfs_in: ZipFile, gtfs_out: ZipFile, filters: Filters):
+        if not self.required and self.filename not in gtfs_in.namelist():
+            return
+        with gtfs_in.open(self.filename, 'r') as csv_in:
+            r = csv.DictReader(io.TextIOWrapper(csv_in, 'utf-8-sig'))
+            for row in r:
+                self.process(row, filters)
 
 
 class ProcessAgencies(ProcessorBase):
@@ -113,6 +130,14 @@ class ProcessStopTimes(ProcessorBase):
             filters.stops.add(row['stop_id'])
             return True
         return False
+
+
+class ProcessParentStops(ReadOnlyProcessorBase):
+    filename = 'stops.txt'
+
+    def process(self, row: dict[str, str], filters: Filters):
+        if row['stop_id'] in filters.stops and row.get('parent_station'):
+            filters.stops.add(row['parent_station'])
 
 
 class ProcessStops(ProcessorBase):
@@ -194,6 +219,7 @@ processors = [
     ProcessCalendarDates(),
     ProcessFrequencies(),
     ProcessStopTimes(),
+    ProcessParentStops(),
     ProcessStops(),
     ProcessTransfers(),
     ProcessFareAttributes(),
