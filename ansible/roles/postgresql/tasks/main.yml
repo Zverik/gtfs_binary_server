@@ -1,0 +1,8 @@
+---
+- name: Install PostgreSQL and PostGIS
+  apt:
+    name:
+      - "postgresql-{{ postgresql_version }}-postgis-{{ postgis_version }}"
+      - "postgresql-contrib-{{ postgresql_version }}"
+      - python3-psycopg2
+    state: present

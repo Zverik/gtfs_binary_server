@@ -13,4 +13,5 @@
     - { role: nginx, tags: nginx }
     - { role: firewall, tags: firewall }
     - { role: geerlingguy.certbot, tags: certbot }
+    - { role: postgresql, tags: psql }
     - { role: gtfs, tags: gtfs }

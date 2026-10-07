@@ -9,6 +9,7 @@ KEEP_DIFFS=${KEEP_DIFFS:-20}
 BSDIFF=${BSDIFF:-bsdiff}
 
 "$SCRIPTS/download_feeds.sh" "$GTFS"
+"$PYTHON" "$SCRIPTS/download_extra.py" --gtfs "$GTFS" --rules "$SCRIPTS/../feeds"
 "$PYTHON" "$SCRIPTS/find_modified.py" --path "$GTFS" --output "$GTFS/updated.lst"
 "$PYTHON" "$SCRIPTS/build_gtb.py" --gtfs "$GTFS" --output "$GTB" --list "$GTFS/updated.lst" \
   --rules "$SCRIPTS/../feeds" --max $MAX_GTFS_ZIP_MB --verbose

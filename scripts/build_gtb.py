@@ -1,4 +1,6 @@
 import os
+import csv
+import io
 from gtfs_binary import pack
 from split_gtfs import split
 import argparse
@@ -6,6 +8,8 @@ import yaml
 import gzip
 import shutil
 import logging
+import zipfile
+import subprocess
 
 
 def convert_feed(source: str, rules: dict, target_path: str, max_bytes: int):
@@ -69,6 +73,57 @@ def split_feed(source: str, rules: dict, rules_path: str, target: str):
     split(source, target, agencies, geometry, polygons, negate)
 
 
+def sort_stop_times(filename: str):
+    # Cannot use tempfile because it must be on the same device.
+    tmpdir = os.path.dirname(filename)
+    tmpfile = os.path.join(tmpdir, 'sorting_stops.tmp.zip')
+    tmpstops = os.path.join(tmpdir, 'stop_times.tmp.txt')
+    with zipfile.ZipFile(filename, 'r') as gtfs:
+        with zipfile.ZipFile(tmpfile, 'w', zipfile.ZIP_DEFLATED) as outzip:
+            for fileinfo in gtfs.infolist():
+                if '.txt' not in fileinfo.filename or fileinfo.is_dir():
+                    continue
+                if fileinfo.filename != 'stop_times.txt':
+                    # Copy file raw
+                    with gtfs.open(fileinfo.filename, 'r') as f_in:
+                        with outzip.open(fileinfo.filename, 'w') as f_out:
+                            shutil.copyfileobj(f_in, f_out)
+                else:
+                    header = None  # to prepend after sorting
+
+                    # Extract, sort, compress.
+                    with gtfs.open(fileinfo.filename, 'r') as f_in:
+                        r = csv.reader(io.TextIOWrapper(f_in, 'utf-8-sig'))
+                        with open(tmpstops, 'w') as f_out:
+                            w = csv.writer(f_out)
+                            trip_id_col = -1
+                            for row in r:
+                                if not header:
+                                    header = row
+                                    trip_id_col = header.index('trip_id')
+                                    if trip_id_col > 0:
+                                        header = (header[trip_id_col:] +
+                                                  header[:trip_id_col])
+                                else:
+                                    # Reorder columns so that trip_id is 1st.
+                                    if trip_id_col > 0:
+                                        row = (row[trip_id_col:] +
+                                               row[:trip_id_col])
+                                    w.writerow(row)
+
+                    # Do the sorting.
+                    subprocess.run(['sort', '-o', tmpstops, tmpstops])
+
+                    # Write the file back including the header.
+                    with open(tmpstops, 'rb') as f_in:
+                        with outzip.open(fileinfo.filename, 'w') as f_out:
+                            f_out.write((','.join(header) + '\n').encode())
+                            shutil.copyfileobj(f_in, f_out)
+                    os.remove(tmpstops)
+    os.remove(filename)
+    os.rename(tmpfile, filename)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Builds GTFS Binary')
     parser.add_argument(
@@ -130,6 +185,23 @@ if __name__ == '__main__':
     for language, feeds in rules.items():
         lprefix = language + '_'
         to_process = set(f for f in gtfs_list if f.startswith(lprefix))
+
+        # Remove replaced feeds from the list
+        for feed, frules in feeds.items():
+            replaces = feeds.get('replaces')
+            if replaces:
+                if isinstance(replaces, str):
+                    replaces = [replaces]
+                for feedname in replaces:
+                    if feedname == '*':
+                        # All feeds except this one
+                        to_process = set()
+                        thisfeed = f'{lprefix}{feed}.gtfs.zip'
+                        if thisfeed in gtfs_list:
+                            to_process.add(thisfeed)
+                    else:
+                        to_process.discard(f'{lprefix}{feedname}.gtfs.zip')
+
         if not to_process:
             continue
 
@@ -169,6 +241,8 @@ if __name__ == '__main__':
                     logging.debug('Splitting %s from %s', feedfile, source)
                     splitpath = os.path.join(options.gtfs, source)
                     split_feed(splitpath, frules, rules_path, feedpath)
+                    if frules.get('sort_stop_times'):
+                        sort_stop_times(feedpath)
                     convert_feed(feedpath, rules, options.output, max_bytes)
                     os.remove(feedpath)
                     used_for_splitting.add(source)
@@ -181,6 +255,8 @@ if __name__ == '__main__':
                 if feedfile in to_process:
                     # Simple conversion with added metadata
                     logging.debug('Converting feed %s', feedfile)
+                    if frules.get('sort_stop_times'):
+                        sort_stop_times(feedpath)
                     convert_feed(feedpath, rules, options.output, max_bytes)
                     to_process.remove(feedfile)
 

@@ -7,15 +7,13 @@ _agencies:
   ticket_info:
     - file: ee_elron.md
       agencies: [10520953]
+    - file: ee_tallinn.md
+      agencies: [10312960]
+
+estonia:
+  replaces: '*'
+  sort_stop_times: true
+  download:
+    url: https://eu-gtfs.remix.com/estonia_unified_gtfs.zip
   title: Eesti
   title_en: Estonia
-
-tallinn:
-  title: Tallinn
-  title_en: Tallinn
-  ticket_info:
-    - file: ee_tallinn.md
-
-elron:
-  title: Rongid
-  title_en: Trains

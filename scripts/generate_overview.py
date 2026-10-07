@@ -1,5 +1,6 @@
 from gtfs_binary.helpers import readers
 from gtfs_binary import g
+from datetime import date
 import os
 import argparse
 import json
@@ -34,9 +35,16 @@ if __name__ == '__main__':
         with open(os.path.join(options.path, gtbfile), 'rb') as f:
             footer = readers.read_footer(f)
         metadata = {
-            'version': footer.date,
+            'version': footer.build,
             'bbox_lat_lon': list(footer.bbox_lat_lon),
         }
+        if footer.date:
+            fdate = date(
+                footer.date // 10000,
+                (footer.date // 100) % 100,
+                footer.date % 100,
+            )
+            metadata['date'] = fdate.strftime('%Y-%m-%d'),
         if footer.title:
             metadata['title'] = footer.title
         if footer.title_en:

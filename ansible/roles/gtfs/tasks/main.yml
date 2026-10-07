@@ -66,7 +66,27 @@
   cron:
     name: update gtb
     user: gtfs
-    job: /opt/gtfs_sc/update_gtb.sh
+    job: /opt/gtfs/update_gtb.sh
     minute: '0'
     hour: '4'
     weekday: '0,3'
+
+- name: Create postgresql role
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: gtfs
+
+- name: Create postgresql db
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: gtfs
+    owner: gtfs
+
+- name: Add a postgis extension
+  become: yes
+  become_user: postgres
+  postgresql_ext:
+    name: postgis
+    login_db: gtfs
