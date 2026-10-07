@@ -1,6 +1,7 @@
 from gtfs_binary.helpers import readers
 from gtfs_binary import g
 from datetime import date
+from rules import read_rules
 import os
 import argparse
 import json
@@ -13,6 +14,9 @@ if __name__ == '__main__':
     parser.add_argument(
         '-p', '--path', required=True,
         help='Path to the latest GTB files')
+    parser.add_argument(
+        '-r', '--rules',
+        help='Path to feed processing rules, ../feeds by default')
     parser.add_argument(
         '-o', '--output',
         help='Path to the resulting JSON, stdout by default')
@@ -28,8 +32,21 @@ if __name__ == '__main__':
     else:
         url = ''
 
+    if not options.rules or not os.path.exists(options.rules):
+        gtbfiles = os.listdir(options.path)
+    else:
+        gtbfiles = []
+        rules = read_rules(options.rules)
+        for language, feeds in rules.items():
+            lprefix = language + '_'
+            for feed, frules in feeds.items():
+                if not frules.get('skip'):
+                    gtbname = f'{language}_{feed}.gtb'
+                    if os.path.exists(os.path.join(options.path, gtbname)):
+                        gtbfiles.append(gtbname)
+
     result = {}
-    for gtbfile in os.listdir(options.path):
+    for gtbfile in gtbfiles:
         if not gtbfile.endswith('.gtb'):
             continue
         with open(os.path.join(options.path, gtbfile), 'rb') as f:
@@ -40,7 +57,7 @@ if __name__ == '__main__':
         }
         if footer.date:
             fdate = date(
-                footer.date // 10000,
+                2000 + footer.date // 10000,
                 (footer.date // 100) % 100,
                 footer.date % 100,
             )

@@ -3,6 +3,7 @@ import csv
 import io
 from gtfs_binary import pack
 from split_gtfs import split
+from rules import read_rules
 import argparse
 import yaml
 import gzip
@@ -149,16 +150,7 @@ if __name__ == '__main__':
         level=logging.DEBUG if options.verbose else logging.WARNING,
         format='%(levelname)s:%(message)s')
 
-    # Read rules
-    rules: dict[str, dict] = {}
-    rules_path = options.rules or os.path.join(
-        os.path.dirname(__file__), '..', 'feeds')
-    rules_list = [f for f in os.listdir(rules_path) if f[-5:] == '.yaml']
-    if not rules_list:
-        raise IOError(f'No rules in {rules_path}')
-    for rulefile in rules_list:
-        with open(os.path.join(rules_path, rulefile), 'r') as f:
-            rules[rulefile[:rulefile.index('.')]] = yaml.safe_load(f)
+    rules = read_rules(options.rules)
 
     # Filter out feeds to big.
     full_list = [f for f in os.listdir(options.gtfs)

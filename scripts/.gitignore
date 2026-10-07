@@ -9,3 +9,11 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Domain-specific
+*.json
+*.txt
+*.zip
+*.gtb
+*.pbf
+*.lst
