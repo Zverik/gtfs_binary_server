@@ -1,0 +1,21 @@
+---
+berne:
+  split: opentransportdataswiss26
+  geojson: ch.geojson
+  polygon: berne
+zurich:
+  split: opentransportdataswiss26
+  geojson: ch.geojson
+  polygon: zurich
+geneve:
+  split: opentransportdataswiss26
+  geojson: ch.geojson
+  polygon: geneve
+south:
+  split: opentransportdataswiss26
+  geojson: ch.geojson
+  polygon: south
+country:
+  split: opentransportdataswiss26
+  geojson: ch.geojson
+  polygon: global

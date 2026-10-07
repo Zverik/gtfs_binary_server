@@ -3,7 +3,7 @@ import csv
 import io
 from gtfs_binary import pack
 from split_gtfs import split
-from rules import read_rules
+from rules import read_rules, rules_path as rp
 import argparse
 import yaml
 import gzip
@@ -69,9 +69,9 @@ def split_feed(source: str, rules: dict, rules_path: str, target: str):
     agencies = [str(s) for s in rules.get('agencies', [])]
     geometry = None if 'geojson' not in rules else os.path.join(
         rules_path, 'meta', rules['geojson'])
-    polygons = [str(s) for s in rules.get('polygons', [])]
+    polygon = rules.get('polygon')
     negate = rules.get('negate', False)
-    split(source, target, agencies, geometry, polygons, negate)
+    split(source, target, agencies, geometry, polygon, negate)
 
 
 def sort_stop_times(filename: str):
@@ -151,6 +151,7 @@ if __name__ == '__main__':
         format='%(levelname)s:%(message)s')
 
     rules = read_rules(options.rules)
+    rules_path = rp(options.rules)
 
     # Filter out feeds to big.
     full_list = [f for f in os.listdir(options.gtfs)

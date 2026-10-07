@@ -86,7 +86,7 @@ class ProcessTrips(ProcessorBase):
         if ok:
             filters.trips.add(row['trip_id'])
             filters.services.add(row['service_id'])
-            if row['shape_id']:
+            if row.get('shape_id'):
                 filters.shapes.add(row['shape_id'])
         return ok
 

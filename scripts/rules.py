@@ -13,3 +13,8 @@ def read_rules(path: str | None) -> dict[str, dict]:
         with open(os.path.join(rules_path, rulefile), 'r') as f:
             rules[rulefile[:rulefile.index('.')]] = yaml.safe_load(f)
     return rules
+
+
+def rules_path(path: str | None) -> str:
+    return path or os.path.join(
+        os.path.dirname(__file__), '..', 'feeds')

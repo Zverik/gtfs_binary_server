@@ -11,7 +11,7 @@ import shutil
 from split_filters import processors, Filters
 
 
-def read_polygon(geojson_file: str, polygon_names: list[str] | None):
+def read_geojson_polygons(geojson_file: str) -> list[dict]:
     with open(geojson_file, 'r') as f:
         geojson = json.load(f)
     typ = geojson.get('type')
@@ -21,16 +21,20 @@ def read_polygon(geojson_file: str, polygon_names: list[str] | None):
         polygons = [geojson]
     else:
         polygons = [{'type': 'Feature', 'geometry': geojson, 'properties': {}}]
+    return polygons
 
+
+def read_polygon(geojson_file: str, polygon_name: str | None):
+    polygons = read_geojson_polygons(geojson_file)
     shapes = []
     for poly in polygons:
         gtyp = poly.get('geometry', {}).get('type')
         if gtyp not in ('Polygon', 'MultiPolygon'):
             continue
         p = poly.get('properties', {})
-        if polygon_names:
+        if polygon_name:
             name = p.get('name') or p.get('title') or p.get('id')
-            if name not in polygon_names:
+            if name != polygon_name:
                 continue
         shapes.append(shape(poly['geometry']))
 
@@ -38,6 +42,25 @@ def read_polygon(geojson_file: str, polygon_names: list[str] | None):
         return None
     result = shapely.unary_union(shapes)
     shapely.prepare(result)
+    return result
+
+
+def read_for_global(geojson_file: str) -> list:
+    polygons = read_geojson_polygons(geojson_file)
+    shapes = defaultdict(list)
+    for poly in polygons:
+        gtyp = poly.get('geometry', {}).get('type')
+        if gtyp not in ('Polygon', 'MultiPolygon'):
+            continue
+        p = poly.get('properties', {})
+        name = p.get('name') or p.get('title') or p.get('id')
+        shapes[name or '_other_'].append(shape(poly['geometry']))
+
+    result = []
+    for v in shapes.values():
+        v = shapely.unary_union(v)
+        shapely.prepare(v)
+        result.append(v)
     return result
 
 
@@ -79,23 +102,38 @@ def stops_in_polygon(gtfs_in: ZipFile, polygon) -> set[str]:
 
 
 def split(inputfile: str, outputfile: str, agencies: list[str] | None = None,
-          geometry: str | None = None, polygons: list[str] | None = None,
+          geometry: str | None = None, polygon_name: str | None = None,
           negate: bool = False):
     with ZipFile(inputfile, 'r') as gtfs_in:
         agency_ids = set[str]()
 
         if geometry:
-            polygon = read_polygon(geometry, polygons)
-            if not polygon:
-                raise IndexError(
-                    f'Could not find a polygon named {polygons} '
-                    f'in {geometry}')
-            poly_stops = stops_in_polygon(gtfs_in, polygon)
-            agency_stops = stops_by_agency(gtfs_in)
-            for agency, stops in agency_stops.items():
-                # 2/3 stops served should be inside the polygon.
-                if 3.0 * len(stops.intersection(poly_stops)) / len(stops) > 2:
-                    agency_ids.add(agency)
+            if polygon_name != 'global':
+                polygon = read_polygon(geometry, polygon_name)
+                if not polygon:
+                    raise IndexError(
+                        f'Could not find a polygon named {polygon} '
+                        f'in {geometry}')
+                poly_stops = stops_in_polygon(gtfs_in, polygon)
+                agency_stops = stops_by_agency(gtfs_in)
+                for agency, stops in agency_stops.items():
+                    # 2/3 stops served should be inside the polygon.
+                    if 3.0 * len(stops.intersection(poly_stops)) / len(stops) > 2:
+                        agency_ids.add(agency)
+            else:
+                polygons = read_for_global(geometry)
+                if not polygons:
+                    raise IndexError(
+                        f'Could not find any polygons in {geometry}')
+                agency_stops = stops_by_agency(gtfs_in)
+                # 159 in global and berne
+                # 303 in global and zurich
+                for polygon in polygons:
+                    poly_stops = stops_in_polygon(gtfs_in, polygon)
+                    for agency, stops in agency_stops.items():
+                        if 3.0 * len(stops.intersection(poly_stops)) / len(stops) > 2:
+                            agency_ids.add(agency)
+                negate = not negate  # a little hack simplifying things
 
         if agencies:
             ag_list = set(a.strip() for a in agencies)
@@ -134,8 +172,10 @@ if __name__ == '__main__':
         '-g', '--geometry',
         help='GeoJSON file with polygons for filtering by stops')
     parser.add_argument(
-        '-p', '--polygons', nargs='*', metavar='poly_name',
-        help='For GeoJSON, names of polygons to filter by')
+        '-p', '--polygon',
+        help='For GeoJSON, name of polygons to filter by. Empty joins '
+        'all polygons. Use "global" to choose agencies outside of '
+        'any polygons')
     parser.add_argument(
         '--not', action='store_true', dest='negate',
         help='Write agencies NOT in the list / polygon')
@@ -143,4 +183,4 @@ if __name__ == '__main__':
 
     agencies = [] if not options.agencies else options.agencies.split(',')
     split(options.input, options.output, agencies,
-          options.geometry, options.polygons, options.negate)
+          options.geometry, options.polygon, options.negate)
