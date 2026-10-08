@@ -19,3 +19,7 @@ country:
   split: opentransportdataswiss26
   geojson: ch.geojson
   polygon: global
+opentransportdataswiss27:
+  skip: true
+opentransportdataswiss-flex:
+  skip: true
