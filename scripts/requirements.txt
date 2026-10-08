@@ -1,3 +1,4 @@
 gtfs-binary @ git+https://github.com/Zverik/gtfs-binary.git
 pyyaml>=6.0.3
 shapely>=2.1.2
+requests>=2.34.2
