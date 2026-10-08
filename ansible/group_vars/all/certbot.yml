@@ -5,10 +5,13 @@ certbot_create_standalone_stop_services: [nginx]
 
 cert_path:
   gtfs: /etc/letsencrypt/live/gtfs.osmz.ee
+  gtb: /etc/letsencrypt/live/gtb.osmz.ee
 
 certbot_certs:
   - domains:
       - gtfs.osmz.ee
+  - domains:
+      - gtb.osmz.ee
 
 # Needed to add --expand
 certbot_create_command: >-
