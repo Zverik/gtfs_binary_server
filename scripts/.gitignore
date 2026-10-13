@@ -12,7 +12,6 @@ wheels/
 
 # Domain-specific
 *.json
-*.txt
 *.zip
 *.gtb
 *.pbf
