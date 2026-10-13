@@ -61,7 +61,7 @@ if __name__ == '__main__':
                 (footer.date // 100) % 100,
                 footer.date % 100,
             )
-            metadata['date'] = fdate.strftime('%Y-%m-%d'),
+            metadata['date'] = fdate.strftime('%Y-%m-%d')
         if footer.title:
             metadata['title'] = footer.title
         if footer.title_en:
