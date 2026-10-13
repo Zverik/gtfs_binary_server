@@ -53,7 +53,7 @@ if __name__ == '__main__':
             footer = readers.read_footer(f)
         metadata = {
             'version': footer.build,
-            'bbox_lat_lon': list(footer.bbox_lat_lon),
+            'bbox_lat_lon': [float(c) / 100 for c in footer.bbox_lat_lon],
         }
         if footer.date:
             fdate = date(
