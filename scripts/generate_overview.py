@@ -54,6 +54,8 @@ if __name__ == '__main__':
         metadata = {
             'version': footer.build,
             'bbox_lat_lon': [float(c) / 100 for c in footer.bbox_lat_lon],
+            # TODO: gzipped size
+            'size': os.path.getsize(os.path.join(options.path, gtbfile)),
         }
         if footer.date:
             fdate = date(
