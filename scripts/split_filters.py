@@ -101,6 +101,7 @@ class ProcessShapes(ProcessorBase):
 
 class ProcessCalendar(ProcessorBase):
     filename = 'calendar.txt'
+    required = False
 
     def process(self, row: dict[str, str], filters: Filters) -> bool:
         return row['service_id'] in filters.services
