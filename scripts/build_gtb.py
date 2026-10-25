@@ -19,7 +19,7 @@ def convert_feed(source: str, rules: dict, target_path: str, max_bytes: int):
                 else basename[:basename.index('.')])
 
     if max_bytes > 1000 and os.stat(source).st_size > max_bytes:
-        logging.warning('Skipping {basename} because it\'t too big')
+        logging.warning(f'Skipping {basename} because it is too big')
         return
 
     gtb_file = f'{basename}.gtb'

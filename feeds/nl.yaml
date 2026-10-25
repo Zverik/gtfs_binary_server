@@ -1,13 +1,13 @@
 ---
 south:
-  split: nl_OpenOV
+  split: OpenOV
   geojson: nl.geojson
   polygon: south
 north:
-  split: nl_OpenOV
+  split: OpenOV
   geojson: nl.geojson
   polygon: north
 amsterdam:
-  split: nl_OpenOV
+  split: OpenOV
   geojson: nl.geojson
   polygon: global
