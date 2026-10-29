@@ -1,13 +1,24 @@
 ---
+_agencies:
+  realtime:
+    - url: "https://gtfs.openov.nl/gtfs-rt/trainUpdates.pb"
+      type: gtfs-rt
+    - url: "https://gtfs.openov.nl/gtfs-rt/tripUpdates.pb"
+      type: gtfs-rt
+    - url: "https://gtfs.openov.nl/gtfs-rt/alerts.pb"
+      type: gtfs-rt
 south:
   split: OpenOV
   geojson: nl.geojson
   polygon: south
+  title_en: "Netherlands South: Rotterdam, Eindhoven"
 north:
   split: OpenOV
   geojson: nl.geojson
   polygon: north
+  title_en: "Netherlands North: Groningen, Zwolle"
 amsterdam:
   split: OpenOV
   geojson: nl.geojson
   polygon: global
+  title_en: "Netherlands Central: Amsterdam, Utrecht"

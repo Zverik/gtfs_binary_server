@@ -2,6 +2,7 @@
 import os
 import sys
 import argparse
+import hashlib
 import logging
 import subprocess
 import gzip
@@ -29,6 +30,12 @@ def decompress_version(feedpath: str, version: int, target: str):
     with gzip.open(os.path.join(feedpath, f'{version}.gtb.gz'), 'rb') as f:
         with open(target, 'wb') as ff:
             shutil.copyfileobj(f, ff)
+
+
+def calculate_md5(filepath: str) -> str:
+    with open(filepath, 'rb') as f:
+        digest = hashlib.file_digest(f, 'md5')
+    return digest.hexdigest()
 
 
 if __name__ == '__main__':
@@ -108,6 +115,7 @@ if __name__ == '__main__':
                 logging.error(
                     'Bsdiff failed on feed %s version %s with code %s: %s',
                     feed, version, p.returncode, p.stderr)
+        latest_md5 = calculate_md5(latest)
         os.remove(latest)
 
         # Remove old diffs.
@@ -119,6 +127,7 @@ if __name__ == '__main__':
         # Prepare the version catalog for the feed.
         catalog = {
             'latest': versions[-1],
+            'md5': latest_md5,
             'diffs': get_versions(diffpath, '.diff'),
         }
         with open(os.path.join(diffpath, 'versions.json'), 'w') as f:
